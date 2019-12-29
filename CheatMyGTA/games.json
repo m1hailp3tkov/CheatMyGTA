@@ -1,0 +1,17 @@
+﻿[
+  {
+    "Name": "Notepad",
+    "ProcessName": "notepad.exe",
+    "CheatCodes": {
+      "weapons cheat #1": "nuttertools"
+    }
+  },
+  {
+    "Name": "Grand Theft Auto Vice City",
+    "ProcessName": "gtavc.exe",
+    "CheatCodes": {
+      "weapons cheat #1": "nuttertools",
+      "health cheat": "aspirine"
+    }
+  }
+]
