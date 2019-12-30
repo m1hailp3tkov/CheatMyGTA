@@ -16,17 +16,13 @@ namespace CheatMyGTA.Models
             this.CheatCodes = new Dictionary<string, string>();
         }
 
+        public GameData(IDictionary<string,string> cheatCodes)
+        {
+            this.CheatCodes = cheatCodes;
+        }
+
         public string Name { get; set; }
 
-        public string ProcessName { get; set; }
-
-        public string ProcessNameNoExtension { get => this.ProcessName.Split('.')[0]; }
-
         public IDictionary<string,string> CheatCodes { get; set; }
-
-        public override string ToString()
-        {
-            return $"{this.Name} ({this.ProcessName})";
-        }
     }
 }

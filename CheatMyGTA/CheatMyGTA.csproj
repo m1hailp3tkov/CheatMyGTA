@@ -67,6 +67,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Contracts\IBindingAgent.cs" />
+    <Compile Include="Contracts\IGame.cs" />
     <Compile Include="Contracts\IGameData.cs" />
     <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\Win32Methods.cs" />
@@ -77,6 +79,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\BindingAgent.cs" />
+    <Compile Include="Models\Game.cs" />
     <Compile Include="Models\GameData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

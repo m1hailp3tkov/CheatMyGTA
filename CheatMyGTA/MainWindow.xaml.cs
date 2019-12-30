@@ -31,43 +31,64 @@ namespace CheatMyGTA
     public partial class MainWindow : Window
     {
         private KeyboardListener keyboardListener;
-        private List<IGameData> games;
+        private IBindingAgent bindingAgent;
+        private List<IGame> games;
 
+        //Constructor
         public MainWindow()
         {
             InitializeComponent();
+            
+            CreateExampleJSON();
 
             //TODO: move those to app.xaml
 
-            games = new List<IGameData>();
             LoadGamesList();
 
             this.keyboardListener = new KeyboardListener();
+            keyboardListener.KeyDown += KeyboardListener_KeyDown;
+            this.bindingAgent = new BindingAgent();
         }
+        
 
         private void KeyboardListener_KeyDown(object sender, RawKeyEventArgs args)
         {
-            //keyboardListener.KeyDown -= KeyboardListener_KeyDown;
+            //Remove event listener so SendKeys.Send does not cause infinite recursion (st. overflow)
+            keyboardListener.KeyDown -= KeyboardListener_KeyDown;
 
-            //SendKeys.SendWait("hello");
+            var key = args.Key;
+            var cheatCode = bindingAgent.GetCheatCode(key);
 
-            //keyboardListener.KeyDown += KeyboardListener_KeyDown;
+            //Binding agent should return "" or null when there is no cheat code on the specified key
+            if(!string.IsNullOrEmpty(cheatCode))
+            {
+                SendKeys.SendWait(cheatCode);
+            }
+
+            //Reattach event listener
+            keyboardListener.KeyDown += KeyboardListener_KeyDown;
         }
 
         private void InitButton_Click(object sender, RoutedEventArgs e)
         {
-            string processName = ((IGameData)gamesComboBox.SelectedItem).ProcessNameNoExtension;
-            var process = Process.GetProcessesByName(processName).FirstOrDefault();
+            var selectedItem = (IGame)gamesComboBox.SelectedItem;
+            //Check whether process exists
+            var process = Process.GetProcessesByName(selectedItem.ProcessNameNoExtension).FirstOrDefault();
 
             if (process == null)
             {
-                System.Windows.Forms.MessageBox.Show($"Couldnt find the process {processName}.exe", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                System.Windows.Forms.MessageBox.Show($"Couldnt find the process {selectedItem.ProcessName}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
+            //Set as active game
+            bindingAgent.SetActive(selectedItem.Data);
+
+
+            //Bring to front logic
             DialogResult result = System.Windows.Forms.MessageBox.Show("Process found. Go to Game?", "Success", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
 
-            if(result == System.Windows.Forms.DialogResult.Yes)
+            if (result == System.Windows.Forms.DialogResult.Yes)
             {
                 Win32Methods.BringToFront(process);
             }
@@ -75,13 +96,15 @@ namespace CheatMyGTA
 
         private void LoadGamesList()
         {
+            this.games = new List<IGame>();
+
             using (StreamReader sr = new StreamReader(Constants.GameInfoLocation))
             {
                 try
                 {
-                    var gamesToAdd = JsonConvert.DeserializeObject<List<GameData>>(sr.ReadToEnd());
+                    var gamesToAdd = JsonConvert.DeserializeObject<List<Game>>(sr.ReadToEnd());
 
-                    if(gamesToAdd != null) games.AddRange(gamesToAdd);
+                    if (gamesToAdd != null) games.AddRange(gamesToAdd);
 
                     if (gamesToAdd.Count == 0) System.Windows.Forms.MessageBox.Show("No gamedata found in games.json.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
@@ -94,6 +117,30 @@ namespace CheatMyGTA
             foreach (var game in games)
             {
                 gamesComboBox.Items.Add(game);
+            }
+        }
+
+
+        // Method to create games.json
+        private void CreateExampleJSON()
+        {
+            games = new List<IGame>();
+            Dictionary<string, string> cheats = new Dictionary<string, string>();
+            cheats.Add("Weapons cheat #1", "nuttertools");
+            Game game = new Game
+            {
+                Data = new GameData
+                {
+                    CheatCodes = cheats,
+                    Name = "Notepad"
+                },
+                ProcessName = "notepad.exe"
+            };
+            games.Add(game);
+
+            using (StreamWriter sw = new StreamWriter(Constants.GameInfoLocation))
+            {
+                sw.Write(JsonConvert.SerializeObject(games, Formatting.Indented));
             }
         }
     }

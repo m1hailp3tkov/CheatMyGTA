@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace CheatMyGTA.Contracts
 {
-    public interface IGameData
+    public interface IBindingAgent
     {
-        string Name { get; set; }
+        void SetActive(IGameData gameData);
 
-        IDictionary<string, string> CheatCodes { get; set; }
+        string GetCheatCode(Key key);
     }
 }
