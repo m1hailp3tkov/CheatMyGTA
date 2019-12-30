@@ -32,22 +32,21 @@ namespace CheatMyGTA
     {
         private KeyboardListener keyboardListener;
         private IBindingAgent bindingAgent;
-        private List<IGame> games;
+        private IList<IGame> games;
 
         //Constructor
         public MainWindow()
         {
             InitializeComponent();
             
-            CreateExampleJSON();
+            //CreateExampleJSON();
 
             //TODO: move those to app.xaml
-
-            LoadGamesList();
+            games = GetGamesList();
 
             this.keyboardListener = new KeyboardListener();
             keyboardListener.KeyDown += KeyboardListener_KeyDown;
-            this.bindingAgent = new BindingAgent();
+            this.bindingAgent = new BindingAgent(games);
         }
         
 
@@ -94,9 +93,9 @@ namespace CheatMyGTA
             }
         }
 
-        private void LoadGamesList()
+        private IList<IGame> GetGamesList()
         {
-            this.games = new List<IGame>();
+            var games = new List<IGame>();
 
             using (StreamReader sr = new StreamReader(Constants.GameInfoLocation))
             {
@@ -118,6 +117,8 @@ namespace CheatMyGTA
             {
                 gamesComboBox.Items.Add(game);
             }
+
+            return games;
         }
 
 
