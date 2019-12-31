@@ -17,53 +17,62 @@ namespace CheatMyGTA.Models
         private Dictionary<string, Dictionary<Key, string>> gameKeyBinds;
         private string activeGameName;
 
-        public BindingAgent(ICollection<IGame> games)
+        //TODO: wrap in an object
+        public BindingAgent(Dictionary<string, Dictionary<Key, string>> gameKeyBinds)
         {
-            CreateSampleJSON();
+            this.gameKeyBinds = gameKeyBinds;
+        }
 
-            var keyBinds = new Dictionary<Key, string>();
-            //keyBinds = games.ToDictionary(k => k.Data.Name, v => v.Data.CheatCodes.ToDictionary()
-
-            using(StreamReader sr = new StreamReader(Constants.KeyBindsLocation))
+        public void BindKey(Key key, string cheatCodeName)
+        {
+            if(gameKeyBinds[activeGameName].ContainsKey(key))
             {
-                var fileContent = sr.ReadToEnd();
-
-                gameKeyBinds = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<Key, string>>>(fileContent);
+                //TODO: Extension class
+                throw new ApplicationException($"[{key}] is already bound for {gameKeyBinds[activeGameName][key]}");
             }
+
+            gameKeyBinds[activeGameName].Add(key, cheatCodeName);
         }
 
         public string GetCheatCode(Key key)
         {   
             if(activeGameName == null)
             {
-                //TODO active game logic;
-                MessageBox.Show("no active game");
                 return "";
             }
 
+            if(gameKeyBinds[activeGameName].ContainsKey(key))
+            {
+                return gameKeyBinds[activeGameName][key];
+            }
 
-            //TODO logic for key not bound (return "")
-            return gameKeyBinds[activeGameName][key];
+            return "";
         }
 
         public void SetActive(IGameData gameData)
         {
-            //TODO: check if gamedata is a key in dict
+            if(string.IsNullOrEmpty(gameData.Name) || string.IsNullOrWhiteSpace(gameData.Name))
+            {
+                throw new ArgumentException($"{nameof(gameData)} does not contain a valid {nameof(gameData.Name)} property.");
+            }
+
+            if(!gameKeyBinds.ContainsKey(gameData.Name))
+            {
+                throw new ArgumentException($"{gameData.Name} does not persist in {nameof(gameKeyBinds)} dictionary.");
+            }
+
             this.activeGameName = gameData.Name;
         }
 
-        private void CreateSampleJSON()
+        public void UnbindKey(Key key)
         {
-            var gameKeyBinds = new Dictionary<string, Dictionary<Key, string>>();
-
-            gameKeyBinds.Add("Notepad", new Dictionary<Key, string>());
-            gameKeyBinds["Notepad"].Add(Key.K, "Weapons cheat #1");
-
-            using(StreamWriter sw = new StreamWriter("../../keyBinds.json"))
+            if (!gameKeyBinds[activeGameName].ContainsKey(key))
             {
-                var json = JsonConvert.SerializeObject(gameKeyBinds, Formatting.Indented);
-                sw.Write(json);
+                //TODO: Extension class
+                throw new ApplicationException($"[{key}] is not bound anywhere");
             }
+
+            gameKeyBinds[activeGameName].Remove(key);
         }
     }
 }

@@ -32,26 +32,40 @@ namespace CheatMyGTA
     {
         private KeyboardListener keyboardListener;
         private IBindingAgent bindingAgent;
-        private IList<IGame> games;
 
         //Constructor
         public MainWindow()
         {
             InitializeComponent();
-            
-            //CreateExampleJSON();
 
             //TODO: move those to app.xaml
-            games = GetGamesList();
+            var games = GetGamesList();
+            var gameKeyBinds = GetKeyBinds();
 
+            this.bindingAgent = new BindingAgent(gameKeyBinds);
             this.keyboardListener = new KeyboardListener();
+
             keyboardListener.KeyDown += KeyboardListener_KeyDown;
-            this.bindingAgent = new BindingAgent(games);
         }
-        
+
+        //Wrap into new interface
+        private Dictionary<string,Dictionary<Key, string>> GetKeyBinds()
+        {
+            using (StreamReader sr = new StreamReader(Constants.KeyBindsLocation))
+            {
+                var fileContent = sr.ReadToEnd();
+                var gameKeyBinds = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<Key, string>>>(fileContent);
+
+                sr.Close();
+
+                return gameKeyBinds;
+            }
+        }
 
         private void KeyboardListener_KeyDown(object sender, RawKeyEventArgs args)
         {
+            //TODO: check if foreground window matches active process
+
             //Remove event listener so SendKeys.Send does not cause infinite recursion (st. overflow)
             keyboardListener.KeyDown -= KeyboardListener_KeyDown;
 
@@ -71,6 +85,12 @@ namespace CheatMyGTA
         private void InitButton_Click(object sender, RoutedEventArgs e)
         {
             var selectedItem = (IGame)gamesComboBox.SelectedItem;
+
+            if(selectedItem == null)
+            {
+                System.Windows.Forms.MessageBox.Show("Please select a game", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
             //Check whether process exists
             var process = Process.GetProcessesByName(selectedItem.ProcessNameNoExtension).FirstOrDefault();
 
@@ -83,10 +103,8 @@ namespace CheatMyGTA
             //Set as active game
             bindingAgent.SetActive(selectedItem.Data);
 
-
             //Bring to front logic
             DialogResult result = System.Windows.Forms.MessageBox.Show("Process found. Go to Game?", "Success", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-
             if (result == System.Windows.Forms.DialogResult.Yes)
             {
                 Win32Methods.BringToFront(process);
@@ -104,7 +122,7 @@ namespace CheatMyGTA
                     var gamesToAdd = JsonConvert.DeserializeObject<List<Game>>(sr.ReadToEnd());
 
                     if (gamesToAdd != null) games.AddRange(gamesToAdd);
-
+                    
                     if (gamesToAdd.Count == 0) System.Windows.Forms.MessageBox.Show("No gamedata found in games.json.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 catch
@@ -123,9 +141,9 @@ namespace CheatMyGTA
 
 
         // Method to create games.json
-        private void CreateExampleJSON()
+        private void CreateSampleGamesJSON()
         {
-            games = new List<IGame>();
+            var games = new List<IGame>();
             Dictionary<string, string> cheats = new Dictionary<string, string>();
             cheats.Add("Weapons cheat #1", "nuttertools");
             Game game = new Game
@@ -139,9 +157,25 @@ namespace CheatMyGTA
             };
             games.Add(game);
 
+            var json = JsonConvert.SerializeObject(games, Formatting.Indented);
             using (StreamWriter sw = new StreamWriter(Constants.GameInfoLocation))
             {
-                sw.Write(JsonConvert.SerializeObject(games, Formatting.Indented));
+                sw.Write(json);
+            }
+        }
+
+        // Method to create keyBinds.json
+        private void CreateSampleKeyBindsJSON()
+        {
+            var gameKeyBinds = new Dictionary<string, Dictionary<Key, string>>();
+
+            gameKeyBinds.Add("Notepad", new Dictionary<Key, string>());
+            gameKeyBinds["Notepad"].Add(Key.K, "Weapons cheat #1");
+
+            var json = JsonConvert.SerializeObject(gameKeyBinds, Formatting.Indented);
+            using (StreamWriter sw = new StreamWriter(Constants.KeyBindsLocation))
+            {
+                sw.Write(json);
             }
         }
     }
