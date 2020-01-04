@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace CheatMyGTA.Contracts
 {
-    public interface IGameData
+    public interface IGameSource
     {
-        string Name { get; set; }
+        void Load();
 
-        IDictionary<string, string> CheatCodes { get; set; }
+        IReadOnlyList<IGame> GameList { get; }
     }
 }

@@ -1,11 +1,9 @@
 [
   {
-    "Data": {
-      "Name": "Notepad",
-      "CheatCodes": {
-        "Weapons cheat #1": "nuttertools"
-      }
-    },
-    "ProcessName": "notepad.exe"
+    "Name": "Notepad",
+    "Process": "notepad.exe",
+    "CheatCodes": {
+      "NUTTERTOOLS": "weapons cheat #1"
+    }
   }
 ]

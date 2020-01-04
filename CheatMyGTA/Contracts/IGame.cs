@@ -9,11 +9,17 @@ namespace CheatMyGTA.Contracts
 {
     public interface IGame
     {
-        IGameData Data { get; set; }
+        string Name { get; set; }
 
-        string ProcessName { get; set; }
+        string Process{ get; set; }
 
         [JsonIgnore]
-        string ProcessNameNoExtension { get; }
+        string ProcessName { get; }
+
+        /// <summary>
+        /// Key - cheatcode
+        /// Value - description
+        /// </summary>
+        IReadOnlyDictionary<string, string> CheatCodes { get; }
     }
 }

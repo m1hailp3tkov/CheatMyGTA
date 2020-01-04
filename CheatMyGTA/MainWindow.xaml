@@ -11,8 +11,8 @@
             <ColumnDefinition/>
             <ColumnDefinition Width="5*"/>
         </Grid.ColumnDefinitions>
-        <Button x:Name="InitButton" Content="Set as active game" Margin="10,37,10,0" VerticalAlignment="Top" AutomationProperties.Name="InitButton" Click="InitButton_Click" Grid.ColumnSpan="2"/>
         <ComboBox x:Name="gamesComboBox" Grid.ColumnSpan="2" Margin="10,10,10,0" VerticalAlignment="Top" RenderTransformOrigin="0.991,-1.67"/>
+        <Button Grid.ColumnSpan="2" Content="Attach to game" Margin="10,37,10,0" VerticalAlignment="Top" Click="AttachToGame"/>
 
     </Grid>
 </Window>

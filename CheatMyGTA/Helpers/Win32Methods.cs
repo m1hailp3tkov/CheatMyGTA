@@ -15,6 +15,11 @@ namespace CheatMyGTA.Helpers
 
         public static void BringToFront(Process pTemp)
         {
+            if(pTemp == null)
+            {
+                throw new ArgumentException($"{nameof(pTemp)} is null");
+            }
+
             SetForegroundWindow(pTemp.MainWindowHandle);
         }
     }
