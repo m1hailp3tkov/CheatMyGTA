@@ -29,6 +29,8 @@ namespace CheatMyGTA
         {
             services.AddSingleton<MainWindow>();
             services.AddSingleton<IGameSource, LocalStorageGameSource>();
+            services.AddSingleton<ICheatBinder, CheatBinder>();
+            services.AddSingleton<IKeyBinds, LocalStorageKeyBinds>();
         }
 
         private void OnStartup(object sender, StartupEventArgs e)

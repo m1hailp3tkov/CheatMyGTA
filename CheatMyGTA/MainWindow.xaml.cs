@@ -21,6 +21,7 @@ using System.Threading;
 using CheatMyGTA.Helpers;
 using CheatMyGTA.Contracts;
 using CheatMyGTA.Models;
+using System.Windows.Forms;
 
 namespace CheatMyGTA
 {
@@ -29,42 +30,83 @@ namespace CheatMyGTA
     /// </summary>
     public partial class MainWindow : Window
     {
-        private KeyboardListener keyboardListener;
+        private readonly ICheatBinder cheatBinder;
 
-        public MainWindow(IGameSource gameSource)
+        private KeyboardListener keyboardListener;
+        private Process process;
+
+        private bool enabled;
+
+        public MainWindow(IGameSource gameSource, ICheatBinder cheatBinder)
         {
             InitializeComponent();
+
+            enabled = false;
 
             gameSource.Load();
             gamesComboBox.ItemsSource = gameSource.GameList;
 
             this.keyboardListener = new KeyboardListener();
+            keyboardListener.KeyDown += OnKeyPress;
+            
+            this.cheatBinder = cheatBinder;
+        }
+
+        private void OnKeyPress(object sender, RawKeyEventArgs args)
+        {
+            var foregroundWindow = Win32Methods.GetForegroundWindow();
+
+            if(enabled && foregroundWindow == process.MainWindowHandle)
+            {
+                var cheatCode = cheatBinder.GetCheatCode(args.Key);
+
+                if(!string.IsNullOrEmpty(cheatCode))
+                {
+                    SendKeys.SendWait(cheatCode);
+                }
+            }
         }
 
         private void AttachToGame(object sender, RoutedEventArgs e)
         {
-            if(gamesComboBox.SelectedItem == null)
+            var game = (IGame)gamesComboBox.SelectedItem;
+
+            if(game == null)
             {
-                MessageBox.Show("Please select a game.");
+                System.Windows.Forms.MessageBox.Show("Please select a game.");
                 return;
             }
 
-            var game = (IGame)gamesComboBox.SelectedItem;
-            var process = Process.GetProcessesByName(game.ProcessName)
+            process = Process.GetProcessesByName(game.ProcessName)
                 .FirstOrDefault();
 
             if(process == null)
             {
-                MessageBox.Show($"Process {game.Process} not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show($"Process {game.Process} not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
-            var msgBoxResult = MessageBox.Show("Process found. Go to game?", "Information", MessageBoxButton.YesNo, MessageBoxImage.Information);
+            cheatBinder.ActiveGame = game;
+            enabled = true;
+            process.EnableRaisingEvents = true;
+            process.Exited += Process_Exited;
 
-            if(msgBoxResult == MessageBoxResult.Yes)
+            var msgBoxResult = System.Windows.MessageBox.Show("Process found. Go to game?", "Information", MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+            if(msgBoxResult == System.Windows.MessageBoxResult.Yes)
             {
                 Win32Methods.BringToFront(process);
             }
+        }
+
+        private void Process_Exited(object sender, EventArgs e)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                process = null;
+                gamesComboBox.SelectedItem = null;
+                enabled = false;
+            });
         }
     }
 }

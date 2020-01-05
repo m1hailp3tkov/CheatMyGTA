@@ -13,6 +13,9 @@ namespace CheatMyGTA.Helpers
         [DllImport("user32.dll")]
         static extern bool SetForegroundWindow(IntPtr hWnd);
 
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetForegroundWindow();
+
         public static void BringToFront(Process pTemp)
         {
             if(pTemp == null)
