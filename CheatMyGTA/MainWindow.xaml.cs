@@ -33,34 +33,52 @@ namespace CheatMyGTA
         private readonly ICheatBinder cheatBinder;
 
         private KeyboardListener keyboardListener;
+        private NativeMethods nativeMethods;
         private Process process;
 
         private bool enabled;
+        private bool isFocused;
 
         public MainWindow(IGameSource gameSource, ICheatBinder cheatBinder)
         {
             InitializeComponent();
 
             enabled = false;
+            isFocused = false;
 
             gameSource.Load();
             gamesComboBox.ItemsSource = gameSource.GameList;
 
+            this.nativeMethods = new NativeMethods();
             this.keyboardListener = new KeyboardListener();
             keyboardListener.KeyDown += OnKeyPress;
             
             this.cheatBinder = cheatBinder;
+
+            nativeMethods.WindowChanged += NativeMethods_WindowChanged;
+        }
+
+        private void NativeMethods_WindowChanged(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+        {
+            if (process == null) return;
+
+            if (NativeMethods.GetProcessIdFromHandle(hwnd) == process.Id)
+            {
+                isFocused = true;
+            }
+            else
+            {
+                isFocused = false;
+            }
         }
 
         private void OnKeyPress(object sender, RawKeyEventArgs args)
         {
-            var foregroundWindow = Win32Methods.GetForegroundWindow();
-
-            if(enabled && foregroundWindow == process.MainWindowHandle)
+            if (enabled && isFocused)
             {
                 var cheatCode = cheatBinder.GetCheatCode(args.Key);
 
-                if(!string.IsNullOrEmpty(cheatCode))
+                if (!string.IsNullOrEmpty(cheatCode))
                 {
                     SendKeys.SendWait(cheatCode);
                 }
@@ -71,7 +89,7 @@ namespace CheatMyGTA
         {
             var game = (IGame)gamesComboBox.SelectedItem;
 
-            if(game == null)
+            if (game == null)
             {
                 System.Windows.Forms.MessageBox.Show("Please select a game.");
                 return;
@@ -80,7 +98,7 @@ namespace CheatMyGTA
             process = Process.GetProcessesByName(game.ProcessName)
                 .FirstOrDefault();
 
-            if(process == null)
+            if (process == null)
             {
                 System.Windows.MessageBox.Show($"Process {game.Process} not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -93,9 +111,9 @@ namespace CheatMyGTA
 
             var msgBoxResult = System.Windows.MessageBox.Show("Process found. Go to game?", "Information", MessageBoxButton.YesNo, MessageBoxImage.Information);
 
-            if(msgBoxResult == System.Windows.MessageBoxResult.Yes)
+            if (msgBoxResult == System.Windows.MessageBoxResult.Yes)
             {
-                Win32Methods.BringToFront(process);
+                NativeMethods.BringToFront(process);
             }
         }
 

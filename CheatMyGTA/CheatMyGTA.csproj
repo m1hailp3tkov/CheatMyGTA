@@ -98,7 +98,7 @@
     <Compile Include="Contracts\IGame.cs" />
     <Compile Include="Contracts\IGameSource.cs" />
     <Compile Include="Helpers\Constants.cs" />
-    <Compile Include="Helpers\Win32Methods.cs" />
+    <Compile Include="Helpers\NativeMethods.cs" />
     <Compile Include="Helpers\KeyboardListener.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
