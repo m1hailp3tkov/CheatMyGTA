@@ -25,7 +25,6 @@ namespace CheatMyGTA.Models
 
         public IReadOnlyDictionary<string, string> CheatCodes
         {
-            //TODO: return actual readonly dictionary
             get => new ReadOnlyDictionary<string,string>(cheatCodes);
             private set => cheatCodes = value.ToDictionary(k => k.Key, v => v.Value);
         }

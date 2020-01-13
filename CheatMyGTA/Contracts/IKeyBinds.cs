@@ -11,6 +11,8 @@ namespace CheatMyGTA.Contracts
     {
         IReadOnlyDictionary<Key, string> GetKeyBinds(IGame game);
 
+        void SetKeyBinds(IGame game, IDictionary<Key, string> keyBinds);
+
         void Save();
     }
 }

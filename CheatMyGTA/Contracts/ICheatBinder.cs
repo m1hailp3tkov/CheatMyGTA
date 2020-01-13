@@ -12,5 +12,7 @@ namespace CheatMyGTA.Contracts
         IGame ActiveGame { get; set; }
 
         string GetCheatCode(Key key);
+
+        void SetCheatCode(Key key, string cheatCode);
     }
 }

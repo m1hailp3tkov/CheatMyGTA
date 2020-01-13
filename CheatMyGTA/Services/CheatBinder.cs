@@ -10,8 +10,10 @@ namespace CheatMyGTA.Services
 {
     public class CheatBinder : ICheatBinder
     {
+        private IGame activeGame;
         private readonly IGameSource gameSource;
         private readonly IKeyBinds keyBinds;
+        private IDictionary<Key, string> gameKeyBinds;
 
         public CheatBinder(IGameSource gameSource, IKeyBinds keyBinds)
         {
@@ -19,18 +21,30 @@ namespace CheatMyGTA.Services
             this.keyBinds = keyBinds;
         }
 
-        public IGame ActiveGame { get; set; }
+        public IGame ActiveGame
+        {
+            get => this.activeGame;
+            set
+            {
+                this.activeGame = value;
+                var binds = (IDictionary<Key, string>)this.keyBinds.GetKeyBinds(activeGame);
+                this.gameKeyBinds = new Dictionary<Key, string>(binds);
+            }
+        }
 
         public string GetCheatCode(Key key)
         {
-            var gameKeyBinds = keyBinds.GetKeyBinds(ActiveGame);
-
             if(gameKeyBinds.ContainsKey(key))
             {
                 return gameKeyBinds[key];
             }
 
             return "";
+        }
+
+        public void SetCheatCode(Key key, string cheatCode)
+        {
+            
         }
     }
 }

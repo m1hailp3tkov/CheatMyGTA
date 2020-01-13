@@ -5,5 +5,16 @@
     "CheatCodes": {
       "NUTTERTOOLS": "weapons cheat #1"
     }
+  },
+  {
+    "Name": "Grand Theft Auto Vice City",
+    "Process": "gta-vc.exe",
+    "CheatCodes": {
+      "NUTTERTOOLS": "weapons cheat #1",
+      "PROFESSIONALTOOLS": "weapons cheat #2",
+      "ASPIRINE": "health cheat",
+      "PRECIOUSPROTECTION": "armor cheat",
+      "LEAVEMEALONE": "clear wanted level"
+    }
   }
 ]

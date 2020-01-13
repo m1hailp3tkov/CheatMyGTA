@@ -43,7 +43,7 @@ namespace CheatMyGTA
         {
             InitializeComponent();
 
-            enabled = false;
+            SetStatus(false);
             isFocused = false;
 
             gameSource.Load();
@@ -105,9 +105,10 @@ namespace CheatMyGTA
             }
 
             cheatBinder.ActiveGame = game;
-            enabled = true;
             process.EnableRaisingEvents = true;
             process.Exited += Process_Exited;
+
+            SetStatus(true, $"{game.Process}");
 
             var msgBoxResult = System.Windows.MessageBox.Show("Process found. Go to game?", "Information", MessageBoxButton.YesNo, MessageBoxImage.Information);
 
@@ -119,12 +120,44 @@ namespace CheatMyGTA
 
         private void Process_Exited(object sender, EventArgs e)
         {
-            this.Dispatcher.Invoke(() =>
+            if(enabled)
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    SetStatus(false, "Game exited");
+                });
+            }
+        }
+
+        private void SetStatus(bool enabled, string labelContent = null)
+        {
+            this.enabled = enabled;
+            if (!enabled)
             {
                 process = null;
-                gamesComboBox.SelectedItem = null;
-                enabled = false;
-            });
+            }
+
+            //UI
+            this.enableButton.IsEnabled = !enabled;
+            this.stopButton.IsEnabled = enabled;
+            this.statusCircle.Fill = enabled ? Brushes.Green : Brushes.Red;
+            this.statusLabel.Content = enabled ? "Active" : "Not active";
+            this.statusLabel.Content += !string.IsNullOrEmpty(labelContent) ? $" - {labelContent}" : "";
+        }
+
+        private void gamesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.keyBindingsButton.IsEnabled = true;
+        }
+
+        private void stopButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.SetStatus(false, "Stopped");
+        }
+
+        private void keyBindingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }

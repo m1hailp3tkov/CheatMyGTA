@@ -12,6 +12,7 @@ namespace CheatMyGTA.Helpers
     {
         public const uint WINEVENT_OUTOFCONTEXT = 0;
         public const uint EVENT_SYSTEM_FOREGROUND = 3;
+        public const int SW_SHOW = 5;
 
         private IntPtr hook;
         private event WinEventDelegate windowChanged;
@@ -50,7 +51,11 @@ namespace CheatMyGTA.Helpers
         public static void BringToFront(Process process)
         {
             SetForegroundWindow(process.MainWindowHandle);
+            ShowWindow(process.MainWindowHandle, 1);
         }
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
@@ -69,10 +74,7 @@ namespace CheatMyGTA.Helpers
 
         ~NativeMethods()
         {
-            if(hook != IntPtr.Zero)
-            {
-                UnhookWinEvent(hook);
-            }
+            UnhookWinEvent(hook);
         }
     }
 }

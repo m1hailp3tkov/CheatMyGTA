@@ -31,9 +31,19 @@ namespace CheatMyGTA.Services
             return this.gamesKeyBinds[game.Name];
         }
 
+        public void SetKeyBinds(IGame game, IDictionary<Key, string> keyBinds)
+        {
+            this.gamesKeyBinds[game.Name] = (Dictionary<Key,string>)keyBinds;
+        }
+
         public void Save()
         {
-            throw new NotImplementedException();
+            var jsonContent = JsonConvert.SerializeObject(this.gamesKeyBinds, Formatting.Indented);
+
+            using(StreamWriter sw = new StreamWriter(Constants.KeyBindsLocation))
+            {
+                sw.WriteLine(jsonContent);
+            }
         }
     }
 }
