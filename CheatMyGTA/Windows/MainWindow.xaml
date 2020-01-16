@@ -28,7 +28,14 @@
                     x:Name="gamesComboBox" 
                     Text="-- Select Game --"
                     IsEditable="True" IsReadOnly="True" SelectionChanged="gamesComboBox_SelectionChanged"
-        />
+        >
+            <ComboBox.Background>
+                <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                    <GradientStop Color="#FFF0F0F0" Offset="0"/>
+                    <GradientStop Color="#FFE5E5E5" Offset="1"/>
+                </LinearGradientBrush>
+            </ComboBox.Background>
+        </ComboBox>
         <Button     
                     Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
                     Margin="0,10,10,0"
@@ -40,7 +47,7 @@
                     Margin="0,10,0,0"
                     x:Name="stopButton"
                     Content="Stop"
-                    IsEnabled="False" Click="stopButton_Click"
+                    IsEnabled="False" Click="stopButton_Click" Background="{x:Null}"
         />
         <Button 
                     Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3"
@@ -48,14 +55,18 @@
                     x:Name="keyBindingsButton"
                     Content="Key Bindings"
                     IsEnabled="False" Click="keyBindingsButton_Click"
-        />
+        >
+            <Button.Background>
+                <ImageBrush/>
+            </Button.Background>
+        </Button>
         <Ellipse    
                     Grid.Row="4" Grid.Column="1"
                     Margin="0,10,0,0"
                     Height="8" Width="8" HorizontalAlignment="Center" Stroke="Black" VerticalAlignment="Top"
                     x:Name="statusCircle">
         </Ellipse>
-        
+
         <Label
                     Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="2"
                     Margin="0,0,0,0"

@@ -28,8 +28,8 @@ namespace CheatMyGTA
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<MainWindow>();
+
             services.AddSingleton<IGameSource, LocalStorageGameSource>();
-            services.AddSingleton<ICheatBinder, CheatBinder>();
             services.AddSingleton<IKeyBinds, LocalStorageKeyBinds>();
         }
 

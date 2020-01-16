@@ -30,7 +30,7 @@ namespace CheatMyGTA
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly ICheatBinder cheatBinder;
+        private readonly IKeyBinds keyBinds;
 
         private KeyboardListener keyboardListener;
         private NativeMethods nativeMethods;
@@ -39,7 +39,7 @@ namespace CheatMyGTA
         private bool enabled;
         private bool isFocused;
 
-        public MainWindow(IGameSource gameSource, ICheatBinder cheatBinder)
+        public MainWindow(IGameSource gameSource, IKeyBinds keyBinds)
         {
             InitializeComponent();
 
@@ -53,8 +53,7 @@ namespace CheatMyGTA
             this.keyboardListener = new KeyboardListener();
             keyboardListener.KeyDown += OnKeyPress;
             
-            this.cheatBinder = cheatBinder;
-
+            this.keyBinds = keyBinds;
             nativeMethods.WindowChanged += NativeMethods_WindowChanged;
         }
 
@@ -76,11 +75,12 @@ namespace CheatMyGTA
         {
             if (enabled && isFocused)
             {
-                var cheatCode = cheatBinder.GetCheatCode(args.Key);
+                //TODO: trycatch
+                var gameKeyBinds = this.keyBinds.GetKeyBinds((IGame)gamesComboBox.SelectedItem);
 
-                if (!string.IsNullOrEmpty(cheatCode))
+                if (gameKeyBinds.ContainsKey(args.Key))
                 {
-                    SendKeys.SendWait(cheatCode);
+                    SendKeys.SendWait(gameKeyBinds[args.Key]);
                 }
             }
         }
@@ -104,7 +104,6 @@ namespace CheatMyGTA
                 return;
             }
 
-            cheatBinder.ActiveGame = game;
             process.EnableRaisingEvents = true;
             process.Exited += Process_Exited;
 
@@ -157,7 +156,8 @@ namespace CheatMyGTA
 
         private void keyBindingsButton_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            var keyBindsWindow = new KeyBindsWindow(keyBinds, (IGame)gamesComboBox.SelectedItem);
+            keyBindsWindow.ShowDialog();
         }
     }
 }

@@ -3,7 +3,12 @@
     "Name": "Notepad",
     "Process": "notepad.exe",
     "CheatCodes": {
-      "NUTTERTOOLS": "weapons cheat #1"
+      "NUTTERTOOLS": "weapons cheat #1",
+      "PROFESSIONALTOOLS": "weapons cheat #2",
+      "ASPIRINE": "health cheat",
+      "PRECIOUSPROTECTION": "armor cheat",
+      "LEAVEMEALONE": "clear wanted level",
+      "GETTHEREFAST": "Spawn a Sabre Turbo"
     }
   },
   {
