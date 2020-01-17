@@ -34,16 +34,11 @@ namespace CheatMyGTA.UserControls
             this.Label.ToolTip = cheat.Key;
         }
 
-        public Nullable<Key> Key 
+        public Nullable<Key> Key
         {
             get => this.key;
             set
             {
-                if (value != null)
-                {
-                    this.KeyChanged(this, new KeyChangedEventArgs { Key = value });
-                }
-
                 this.key = value;
                 this.KeyButton.Content = value.ToString();
             }
@@ -59,10 +54,15 @@ namespace CheatMyGTA.UserControls
 
         private void SenderBtn_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.Key != System.Windows.Input.Key.Escape)
+            bool edited = false;
+
+            if (e.Key != System.Windows.Input.Key.Escape && e.Key != this.Key)
             {
+                edited = true;
                 this.Key = e.Key;
             }
+
+            this.KeyChanged(this, new KeyPressEventArgs { Key = e.Key, Edited = edited });
 
             ((Button)sender).Background = Brushes.LightGray;
 
@@ -71,15 +71,18 @@ namespace CheatMyGTA.UserControls
 
         private void RemoveButton_Click(object sender, RoutedEventArgs e)
         {
-            
+            bool edited = this.Key == null;
+            this.Key = null;
+            this.KeyChanged(this, new KeyPressEventArgs { Key = null, Edited = edited });
         }
 
-        public event EventHandler<KeyChangedEventArgs> KeyChanged;
+        public event EventHandler<KeyPressEventArgs> KeyChanged;
 
     }
 
-    public class KeyChangedEventArgs : EventArgs
+    public class KeyPressEventArgs : EventArgs
     {
         public Nullable<Key> Key { get; set; }
+        public bool Edited { get; set; }
     }
 }

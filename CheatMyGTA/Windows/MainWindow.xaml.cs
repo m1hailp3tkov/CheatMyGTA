@@ -75,7 +75,7 @@ namespace CheatMyGTA
         {
             if (enabled && isFocused)
             {
-                //TODO: trycatch
+                //TODO: trycatch KeyNotFoundException
                 var gameKeyBinds = this.keyBinds.GetKeyBinds((IGame)gamesComboBox.SelectedItem);
 
                 if (gameKeyBinds.ContainsKey(args.Key))

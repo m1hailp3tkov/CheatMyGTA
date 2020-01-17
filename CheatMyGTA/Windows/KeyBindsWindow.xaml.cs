@@ -24,15 +24,36 @@ namespace CheatMyGTA
         private readonly IKeyBinds keyBinds;
         private readonly IGame game;
         private IDictionary<Key, string> keyBindsDictionary;
+        private bool edited;
 
         public KeyBindsWindow(IKeyBinds keyBinds, IGame game)
         {
             InitializeComponent();
+
+            this.edited = false;
             this.keyBinds = keyBinds;
             this.game = game;
             this.keyBindsDictionary = this.keyBinds.GetKeyBinds(game).ToDictionary(x => x.Key, y => y.Value);
 
             CreateChildren(game.CheatCodes);
+
+            this.Closing += KeyBindsWindow_Closing;
+        }
+
+        private void KeyBindsWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if(edited)
+            {
+                var result = MessageBox.Show("Save changes?", "Warning", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                if(result == MessageBoxResult.Yes)
+                {
+                    //TODO: Save logic
+                }
+                else if(result == MessageBoxResult.Cancel)
+                {
+                    e.Cancel = true;
+                }
+            }
         }
 
         private void CreateChildren(IReadOnlyDictionary<string, string> cheatCodes)
@@ -57,6 +78,8 @@ namespace CheatMyGTA
 
         private void KeyButton_Click(object sender, RoutedEventArgs e)
         {
+            this.HelpLabel.Content = "Press the new key (ESC to cancel)";
+
             foreach(var cheatCodeKey in this.StackPanel.Children.OfType<CheatCodeKey>())
             {
                 if(cheatCodeKey.KeyButton != sender)
@@ -66,8 +89,11 @@ namespace CheatMyGTA
             }
         }
 
-        private void CheatCodeKey_KeyChanged(object sender, KeyChangedEventArgs e)
+        private void CheatCodeKey_KeyChanged(object sender, KeyPressEventArgs e)
         {
+            this.HelpLabel.Content = "";
+            this.edited = this.edited || e.Edited;
+
             if (e.Key == null) return;
 
             var btn = this.StackPanel.Children
