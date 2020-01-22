@@ -47,7 +47,7 @@
                     Margin="0,10,0,0"
                     x:Name="stopButton"
                     Content="Stop"
-                    IsEnabled="False" Click="stopButton_Click" Background="{x:Null}"
+                    IsEnabled="False" Click="stopButton_Click"
         />
         <Button 
                     Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3"
@@ -55,11 +55,9 @@
                     x:Name="keyBindingsButton"
                     Content="Key Bindings"
                     IsEnabled="False" Click="keyBindingsButton_Click"
-        >
-            <Button.Background>
-                <ImageBrush/>
-            </Button.Background>
-        </Button>
+        />
+
+
         <Ellipse    
                     Grid.Row="4" Grid.Column="1"
                     Margin="0,10,0,0"

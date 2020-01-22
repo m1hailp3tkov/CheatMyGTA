@@ -14,33 +14,13 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="45"/>
-            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="0"/>
             <ColumnDefinition Width="30"/>
             <ColumnDefinition Width="5"/>
         </Grid.ColumnDefinitions>
 
         <Label Grid.Column="0" x:Name="Label"/>
-        <Button Grid.Column="1" Click="KeyButton_Click" x:Name="KeyButton">
-            <Button.Style>
-                <Style TargetType="{x:Type Button}">
-                    <Setter Property="Background" Value="LightGray" />
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type Button}">
-                                <Border x:Name="Border" Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="Gray">
-                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                </Border>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="DarkGray"  TargetName="Border" />
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </Button.Style>
-        </Button>
-        <Button Content="❌" Foreground="#FFDD0000" Grid.Column="3" Click="RemoveButton_Click" x:Name="RemoveButton"></Button>
+        <Button Grid.Column="1" Click="KeyButton_Click" x:Name="KeyButton" Background="LightGray"/>
+        <Button Content="❌" Foreground="Red" Background="LightGray" BorderBrush="Gray" Grid.Column="3" Click="RemoveButton_Click" x:Name="RemoveButton"></Button>
     </Grid>
 </UserControl>

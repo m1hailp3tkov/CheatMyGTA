@@ -32,7 +32,11 @@ namespace CheatMyGTA.UserControls
 
             this.Label.Content = this.CheatCode;
             this.Label.ToolTip = cheat.Key;
+
+            this.KeyChanged += CheatCodeKey_KeyChanged;
         }
+
+        
 
         public Nullable<Key> Key
         {
@@ -43,7 +47,15 @@ namespace CheatMyGTA.UserControls
                 this.KeyButton.Content = value.ToString();
             }
         }
+
         public string CheatCode { get; private set; }
+
+        private void CheatCodeKey_KeyChanged(object sender, KeyPressEventArgs e)
+        {
+            ((CheatCodeKey)sender).KeyButton.Background = Brushes.LightGray;
+
+            ((CheatCodeKey)sender).KeyButton.KeyDown -= SenderBtn_KeyDown;
+        }
 
         private void KeyButton_Click(object sender, RoutedEventArgs e)
         {
@@ -63,21 +75,16 @@ namespace CheatMyGTA.UserControls
             }
 
             this.KeyChanged(this, new KeyPressEventArgs { Key = e.Key, Edited = edited });
-
-            ((Button)sender).Background = Brushes.LightGray;
-
-            ((Button)sender).KeyDown -= SenderBtn_KeyDown;
         }
 
         private void RemoveButton_Click(object sender, RoutedEventArgs e)
         {
-            bool edited = this.Key == null;
+            bool edited = this.Key != null;
             this.Key = null;
             this.KeyChanged(this, new KeyPressEventArgs { Key = null, Edited = edited });
         }
 
         public event EventHandler<KeyPressEventArgs> KeyChanged;
-
     }
 
     public class KeyPressEventArgs : EventArgs

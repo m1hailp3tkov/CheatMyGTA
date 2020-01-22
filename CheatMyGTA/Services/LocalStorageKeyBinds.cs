@@ -3,6 +3,7 @@ using CheatMyGTA.Helpers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -27,18 +28,42 @@ namespace CheatMyGTA.Services
 
         public IReadOnlyDictionary<Key, string> GetKeyBinds(IGame game)
         {
-            //TODO: actual readonly Dictionary
-            return this.gamesKeyBinds[game.Name];
+            if (game == null) throw new ArgumentNullException(nameof(game));
+
+            if(!gamesKeyBinds.ContainsKey(game.Name))
+            {
+                this.gamesKeyBinds.Add(game.Name, new Dictionary<Key, string>());
+            }
+                
+            return new ReadOnlyDictionary<Key, string>(this.gamesKeyBinds[game.Name]);
         }
 
         public void SetKeyBinds(IGame game, IDictionary<Key, string> keyBinds)
         {
+            if (game == null) throw new ArgumentNullException(nameof(game));
+            if (keyBinds == null) throw new ArgumentNullException(nameof(keyBinds));
+
+            if(keyBinds.Count == 0)
+            {
+                this.gamesKeyBinds.Remove(game.Name);
+                return;
+            }
+
             this.gamesKeyBinds[game.Name] = (Dictionary<Key,string>)keyBinds;
         }
 
         public void Save()
         {
-            var jsonContent = JsonConvert.SerializeObject(this.gamesKeyBinds, Formatting.Indented);
+            var ordered = this.gamesKeyBinds
+                .OrderBy(x => x.Key)
+                .ToDictionary(
+                                key => key.Key, 
+                                value => value.Value
+                                    .OrderBy(x => x.Key)
+                                    .ToDictionary(x => x.Key, y => y.Value));
+
+
+            var jsonContent = JsonConvert.SerializeObject(ordered, Formatting.Indented);
 
             using(StreamWriter sw = new StreamWriter(Constants.KeyBindsLocation))
             {
